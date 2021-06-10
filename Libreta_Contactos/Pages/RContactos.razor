@@ -1,0 +1,162 @@
+﻿@page "/Contactos"
+
+@inject IToastService toastService
+
+<EditForm Model="Contacto" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card-header">
+        <h2>Registro de Contactos</h2>
+    </div>
+
+    <div class="card-body">
+        <form>
+
+            <div class="form-group">
+                <label for="ContactoId">Contacto</label>
+                <div class="input-group">
+                    <InputSelect class="form-control" @bind-Value="Contacto.ContactoId">
+                        @foreach (var contacto in ListaContactos)
+                        {
+                            <option value="@contacto.ContactoId">@contacto.Nombre  @contacto.Apellido, @contacto.Telefono</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => Contacto.ContactoId)" />
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-warning" @onclick="Buscar">
+                            <i class="oi oi-magnifying-glass mr-1" />Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Nombre">Nombre</label>
+                <div class="input-group">
+                    <InputText @bind-Value="Contacto.Nombre" class="form-control " />
+                </div>
+                <div><ValidationMessage For="@(() => Contacto.Nombre)" /></div>
+            </div>
+
+            <div class="form-group">
+                <label for="Apellido">Apellido</label>
+                <div class="input-group">
+                    <InputText @bind-Value="Contacto.Apellido"  class="form-control " />
+                </div>
+                <div><ValidationMessage For="@(() => Contacto.Apellido)" /></div>
+            </div>
+
+            <div class="form-group">
+                <label for="Telefono">Tel&eacute;fono</label>
+                <div class="input-group">
+                    <SfMaskedTextBox Width="130" @bind-Value="Contacto.Telefono" Mask="[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]" />
+                    <ValidationMessage For="@(() => Contacto.Telefono)" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Direccion">Direcci&oacute;n</label>
+                <div class="input-group">
+                    <InputText @bind-Value="Contacto.Direccion" class="form-control" />
+                </div>
+                <div><ValidationMessage For="@(() => Contacto.Direccion)" /></div>
+            </div>
+
+            <div class="form-group">
+                <label for="Correo">Correo electr&oacute;nico</label>
+                <div class="input-group">
+                    <InputText @bind-Value="Contacto.Correo" class="form-control" />
+                    <ValidationMessage For="@(() => Contacto.Correo)" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Comentario">Comentario</label>
+                <div class="input-group">
+                    <InputTextArea @bind-Value="Contacto.Comentario" class="form-control" />
+                    <ValidationMessage For="@(() => Contacto.Comentario)" />
+                </div>
+            </div>
+
+        </form>
+
+        <div class="card-footer">
+            <div class="form-group text-center" display: inline-block>
+
+                <button type="button" class="btn btn-lg btn-primary" @onclick="Limpiar">
+                    <i class="oi oi-file mr-1" />Nuevo
+                </button>
+
+                <button type="submit" class="btn btn-lg btn-success">
+                    <i class="oi oi-account-login mr-1" style="transform:rotate(90deg)" />Guardar
+                </button>
+
+                <button type="button" class="btn btn-lg btn-danger" @onclick="Eliminar">
+                    <i class="oi oi-trash mr-1" />Eliminar
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+</EditForm>
+
+@code {
+
+    private Contactos Contacto = new Contactos();
+    private List<Contactos> ListaContactos { get; set;}
+
+    protected override void OnInitialized()
+    {
+        ListaContactos = ContactosBLL.GetList();
+        Limpiar();
+
+        Buscar();
+    }
+    private void Limpiar()
+    {
+        Contacto = new Contactos();
+    }
+    private void Buscar()
+    {
+        if (Contacto.ContactoId > 0)
+        {
+            var encontrado = ContactosBLL.Buscar(Contacto.ContactoId);
+
+            if (encontrado != null)
+                this.Contacto = encontrado;
+            else
+                toastService.ShowWarning("No encontrado");
+        }
+    }
+
+    public void Guardar()
+    {
+        bool guardo;
+
+        guardo = ContactosBLL.Guardar(Contacto);
+
+        if (guardo)
+        {
+            Limpiar();
+            toastService.ShowSuccess("Guardado correctamente");
+        }
+        else
+            toastService.ShowError("No fue posible guardar");
+    }
+
+    public void Eliminar()
+    {
+        bool elimino;
+
+        elimino = ContactosBLL.Eliminar(Contacto.ContactoId);
+
+        if (elimino)
+        {
+            Limpiar();
+            toastService.ShowSuccess("Eliminado correctamente");
+        }
+        else
+            toastService.ShowError("No fue posible eliminar");
+    }
+
+}
