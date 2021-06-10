@@ -107,7 +107,7 @@
 
     protected override void OnInitialized()
     {
-        ListaContactos = ContactosBLL.GetList();
+        ListaContactos = ContactosBLL.GetList(c => true);
         Limpiar();
 
         Buscar();

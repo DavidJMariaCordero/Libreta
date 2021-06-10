@@ -1,0 +1,104 @@
+﻿@page "/c_Contactos"
+
+
+
+<div >
+
+    <div class="card-header">
+        <h3>Consulta de Contactos</h3>
+    </div>
+
+    <div class="card-body">
+        <form>
+
+            <div class="input-group">
+                <select class="form-control col-4" @bind="Filtro" >
+                    <option value="0">Filtro</option>
+                    <option value="1">Nombre</option>
+                    <option value="2">Apellido</option>
+                    <option value="3">Tel&eacute;fono</option>
+                    <option value="4">Correo el&eacute;ctronico</option>
+                </select>
+                <input type="text" class="form-control" @bind="Criterio" placeholder="Criterio" />
+                <button class="btn btn-primary" type="button" @onclick="Buscar">Buscar</button>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Telefono</th>
+                        <th>Direccion</th>
+                        <th>Correo electronico</th>
+                        <th>Comentario</th>
+                    </tr>
+                </thead>
+                <tbody class="text-dark">
+                    @foreach (var contacto in ListaContactos)
+                     {
+                        <tr>
+                            <td>@contacto.Nombre</td>
+                            <td>@contacto.Apellido </td>
+                            <td>@contacto.Telefono</td>
+                            <td>@contacto.Direccion</td>
+                            <td>@contacto.Correo</td>
+                            <td>@contacto.Comentario</td>
+                        </tr>
+                     }
+                </tbody>
+            </table>
+        </form>
+
+    </div>
+    
+</div>
+
+
+@code {
+    public List<Contactos> ListaContactos { get; set; }
+    public string Filtro { get; set; }
+    public string Criterio { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Nuevo();
+    }
+
+    private void Nuevo()
+    {
+        ListaContactos = new List<Contactos>();
+        Filtro = "0";
+        Criterio = string.Empty;
+    }
+
+    private void Buscar()
+    {
+        ListaContactos = new List<Contactos>();
+
+        if (Criterio.Length > 0)
+        {
+            switch (Filtro)
+            {
+                case "0":
+                    ListaContactos = ContactosBLL.GetList(c => true);
+                    break;
+                case "1":
+                    ListaContactos = ContactosBLL.GetList(c => c.Nombre.Contains(Criterio));
+                    break;
+                case "2":
+                    ListaContactos = ContactosBLL.GetList(c => c.Apellido.Contains(Criterio));
+                    break;
+                case "3":
+                    ListaContactos = ContactosBLL.GetList(c => c.Telefono.Contains(Criterio));
+                    break;
+                case "4":
+                    ListaContactos = ContactosBLL.GetList(c => c.Correo.Contains(Criterio));
+                    break;
+            }
+        }
+        else
+            ListaContactos = ContactosBLL.GetList(p => true);
+
+    }
+}

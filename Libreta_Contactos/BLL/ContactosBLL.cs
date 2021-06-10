@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Libreta_Contactos.BLL
@@ -121,25 +122,26 @@ namespace Libreta_Contactos.BLL
             return contacto;
         }
 
-        public static List<Contactos> GetList()
+        public static List<Contactos> GetList(Expression<Func<Contactos, bool>> criterio)
         {
-            List<Contactos> lista = new List<Contactos>();
-            Contexto contexto = new Contexto();
+            List<Contactos> list = new List<Contactos>();
+            Contexto context = new Contexto();
 
             try
             {
-                lista = contexto.Contactos.ToList();
+                list = context.Contactos.Where(criterio).AsNoTracking().ToList();
             }
             catch (Exception)
             {
                 throw;
+
             }
             finally
             {
-                contexto.Dispose();
+                context.Dispose();
             }
-            return lista;
 
+            return list;
         }
     }
 }
